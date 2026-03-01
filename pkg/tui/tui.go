@@ -15,6 +15,8 @@ type view int
 const (
 	viewDashboard view = iota
 	viewPostList
+	viewTagList
+	viewMemberList
 )
 
 type model struct {
@@ -44,6 +46,18 @@ type model struct {
 	loading      bool
 	selected     int
 
+	// Tag list.
+	tags        []ghost.Tag
+	tagPag      *ghost.Pagination
+	tagCursor   int
+	tagExpanded int
+
+	// Member list.
+	members        []ghost.Member
+	memberPag      *ghost.Pagination
+	memberCursor   int
+	memberExpanded int
+
 	// Help.
 	help help.Model
 }
@@ -69,9 +83,11 @@ func initialModel(client *ghost.Client, startView view) model {
 		client:       client,
 		statusFilter: "all",
 		filterInput:  ti,
-		selected:     -1,
-		loading:      true,
-		help:         h,
+		selected:       -1,
+		tagExpanded:    -1,
+		memberExpanded: -1,
+		loading:        true,
+		help:           h,
 	}
 }
 
@@ -111,6 +127,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return dashboardUpdate(m, msg)
 	case viewPostList:
 		return postListUpdate(m, msg)
+	case viewTagList:
+		return tagListUpdate(m, msg)
+	case viewMemberList:
+		return memberListUpdate(m, msg)
 	}
 
 	return m, nil
@@ -127,6 +147,10 @@ func (m model) View() string {
 		return dashboardView(m)
 	case viewPostList:
 		return postListView(m)
+	case viewTagList:
+		return tagListView(m)
+	case viewMemberList:
+		return memberListView(m)
 	}
 
 	return ""
