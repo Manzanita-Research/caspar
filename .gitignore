@@ -2,3 +2,4 @@ caspar
 ghostctl
 .claude/
 docker-compose.yml
+.ghost-local/
