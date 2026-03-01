@@ -11,6 +11,7 @@ type keyMap struct {
 	Escape   key.Binding
 	Tab      key.Binding
 	Filter   key.Binding
+	Search   key.Binding
 	NextPage key.Binding
 	PrevPage key.Binding
 }
@@ -48,6 +49,10 @@ var keys = keyMap{
 		key.WithKeys("/"),
 		key.WithHelp("/", "filter"),
 	),
+	Search: key.NewBinding(
+		key.WithKeys("s"),
+		key.WithHelp("s", "search"),
+	),
 	NextPage: key.NewBinding(
 		key.WithKeys("n"),
 		key.WithHelp("n/N", "page"),
@@ -76,7 +81,7 @@ type postListKeys struct {
 func (k postListKeys) ShortHelp() []key.Binding {
 	return []key.Binding{
 		keys.Up, keys.Down, keys.Enter, keys.Tab,
-		keys.Filter, keys.NextPage, k.escape, keys.Quit,
+		keys.Filter, keys.Search, keys.NextPage, k.escape, keys.Quit,
 	}
 }
 

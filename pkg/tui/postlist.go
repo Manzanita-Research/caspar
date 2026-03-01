@@ -22,6 +22,43 @@ func postListUpdate(m model, msg tea.Msg) (model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
+		// When searching, route keys to the text input.
+		if m.searching {
+			switch {
+			case key.Matches(msg, keys.Escape):
+				m.searching = false
+				m.searchQuery = ""
+				m.filterInput.SetValue("")
+				m.filterInput.Blur()
+				m.filterInput.Placeholder = "NQL filter (e.g. featured:true)"
+				m.loading = true
+				return m, loadPosts(m.client, 1, m.statusFilter, "")
+			case msg.String() == "enter":
+				m.searching = false
+				m.filterInput.Blur()
+				// Keep search results visible — store the search as an NQL filter.
+				m.filterInput.SetValue("title:~'" + m.searchQuery + "'")
+				m.filterInput.Placeholder = "NQL filter (e.g. featured:true)"
+				return m, nil
+			default:
+				var cmd tea.Cmd
+				m.filterInput, cmd = m.filterInput.Update(msg)
+				newVal := m.filterInput.Value()
+				var searchCmd tea.Cmd
+				if newVal != m.searchQuery {
+					m.searchQuery = newVal
+					if newVal != "" {
+						m.loading = true
+						searchCmd = searchPosts(m.client, newVal)
+					} else {
+						m.loading = true
+						searchCmd = loadPosts(m.client, 1, m.statusFilter, "")
+					}
+				}
+				return m, tea.Batch(cmd, searchCmd)
+			}
+		}
+
 		// When filtering, route keys to the text input.
 		if m.filtering {
 			switch {
@@ -96,6 +133,14 @@ func postListUpdate(m model, msg tea.Msg) (model, tea.Cmd) {
 			m.filterInput.Focus()
 			return m, nil
 
+		case key.Matches(msg, keys.Search):
+			m.searching = true
+			m.searchQuery = ""
+			m.filterInput.SetValue("")
+			m.filterInput.Placeholder = "search by title..."
+			m.filterInput.Focus()
+			return m, nil
+
 		case msg.String() == "n":
 			if m.postPag != nil && m.postPag.Next != nil {
 				m.loading = true
@@ -129,7 +174,7 @@ func postListView(m model) string {
 	b.WriteString("\n")
 
 	// Active filter display.
-	if m.filterInput.Value() != "" {
+	if !m.searching && m.filterInput.Value() != "" {
 		b.WriteString(indent(labelStyle.Render("filter: ") + valueStyle.Render(m.filterInput.Value())))
 		b.WriteString("\n")
 	}
@@ -185,8 +230,17 @@ func postListView(m model) string {
 	b.WriteString(indent(divider(w - 4)))
 	b.WriteString("\n\n")
 
-	// Filter input.
-	if m.filtering {
+	// Search / filter input.
+	if m.searching {
+		b.WriteString(indent(filterPromptStyle.Render("search: ") + m.filterInput.View()))
+		b.WriteString("\n")
+		if m.searchQuery != "" && !m.loading {
+			count := len(m.posts)
+			b.WriteString(indent(labelStyle.Render(fmt.Sprintf("%d result(s)", count))))
+			b.WriteString("\n")
+		}
+		b.WriteString("\n")
+	} else if m.filtering {
 		b.WriteString(indent(filterPromptStyle.Render("/ ") + m.filterInput.View()))
 		b.WriteString("\n\n")
 	}

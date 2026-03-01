@@ -51,6 +51,24 @@ func loadDashboard(client *ghost.Client) tea.Cmd {
 	}
 }
 
+func searchPosts(client *ghost.Client, query string) tea.Cmd {
+	return func() tea.Msg {
+		filter := "title:~'" + query + "'"
+
+		params := ghost.ListParams{
+			Limit:   15,
+			Filter:  filter,
+			Include: "tags",
+		}
+
+		posts, pag, err := client.ListPosts(params)
+		if err != nil {
+			return errMsg{fmt.Errorf("searching posts: %w", err)}
+		}
+		return postsLoadedMsg{posts: posts, pagination: pag}
+	}
+}
+
 func loadPosts(client *ghost.Client, page int, statusFilter, nqlFilter string) tea.Cmd {
 	return func() tea.Msg {
 		filter := ""
