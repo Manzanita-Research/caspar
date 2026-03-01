@@ -16,6 +16,16 @@ make build              # same as above, plus install
 - `pkg/ghost/` — API client, JWT auth, types for each resource.
 - `pkg/config/` — `~/.caspar.json` management.
 - `pkg/output/` — JSON vs lipgloss-styled output.
+- `pkg/tui/` — interactive bubbletea TUI (dashboard + post list).
+
+## TUI Libraries
+
+Prefer charmbracelet for all terminal UI work:
+- [bubbletea](https://github.com/charmbracelet/bubbletea) — TUI framework
+- [bubbles](https://github.com/charmbracelet/bubbles) — components (help, textinput, etc.)
+- [lipgloss](https://github.com/charmbracelet/lipgloss) — styling and layout
+- [huh](https://github.com/charmbracelet/huh) — forms and prompts
+- [glamour](https://github.com/charmbracelet/glamour) — markdown rendering
 
 ## Conventions
 
