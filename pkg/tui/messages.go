@@ -15,6 +15,10 @@ type postsLoadedMsg struct {
 	pagination *ghost.Pagination
 }
 
+type postDetailMsg struct {
+	post ghost.Post
+}
+
 type errMsg struct {
 	err error
 }

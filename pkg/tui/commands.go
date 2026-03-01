@@ -51,6 +51,18 @@ func loadDashboard(client *ghost.Client) tea.Cmd {
 	}
 }
 
+func loadPostDetail(client *ghost.Client, id string) tea.Cmd {
+	return func() tea.Msg {
+		post, err := client.GetPost(id, ghost.ListParams{
+			Include: "tags,authors",
+		})
+		if err != nil {
+			return errMsg{fmt.Errorf("loading post: %w", err)}
+		}
+		return postDetailMsg{post: *post}
+	}
+}
+
 func loadPosts(client *ghost.Client, page int, statusFilter, nqlFilter string) tea.Cmd {
 	return func() tea.Msg {
 		filter := ""

@@ -83,3 +83,14 @@ func (k postListKeys) ShortHelp() []key.Binding {
 func (k postListKeys) FullHelp() [][]key.Binding {
 	return [][]key.Binding{k.ShortHelp()}
 }
+
+// postDetailKeys is the help.KeyMap for the post detail view.
+type postDetailKeys struct{}
+
+func (postDetailKeys) ShortHelp() []key.Binding {
+	return []key.Binding{keys.Escape, keys.Quit}
+}
+
+func (postDetailKeys) FullHelp() [][]key.Binding {
+	return [][]key.Binding{{keys.Escape, keys.Quit}}
+}

@@ -15,6 +15,7 @@ type view int
 const (
 	viewDashboard view = iota
 	viewPostList
+	viewPostDetail
 )
 
 type model struct {
@@ -43,6 +44,10 @@ type model struct {
 	filtering    bool
 	loading      bool
 	selected     int
+
+	// Post detail.
+	detailPost    *ghost.Post
+	detailContent string
 
 	// Help.
 	help help.Model
@@ -111,6 +116,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return dashboardUpdate(m, msg)
 	case viewPostList:
 		return postListUpdate(m, msg)
+	case viewPostDetail:
+		return postDetailUpdate(m, msg)
 	}
 
 	return m, nil
@@ -127,6 +134,8 @@ func (m model) View() string {
 		return dashboardView(m)
 	case viewPostList:
 		return postListView(m)
+	case viewPostDetail:
+		return postDetailView(m)
 	}
 
 	return ""

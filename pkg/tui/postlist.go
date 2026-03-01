@@ -71,11 +71,10 @@ func postListUpdate(m model, msg tea.Msg) (model, tea.Cmd) {
 
 		case key.Matches(msg, keys.Enter):
 			if len(m.posts) > 0 {
-				if m.selected == m.cursor {
-					m.selected = -1
-				} else {
-					m.selected = m.cursor
-				}
+				p := m.posts[m.cursor]
+				m.currentView = viewPostDetail
+				m.loading = true
+				return m, loadPostDetail(m.client, p.ID)
 			}
 			return m, nil
 
@@ -164,11 +163,6 @@ func postListView(m model) string {
 				b.WriteString(indent(normalRowStyle.Render(row)))
 			}
 			b.WriteString("\n")
-
-			// Expanded detail pane.
-			if i == m.selected {
-				b.WriteString(postDetailPane(p, w))
-			}
 		}
 	}
 
