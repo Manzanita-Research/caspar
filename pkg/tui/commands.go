@@ -2,6 +2,9 @@ package tui
 
 import (
 	"fmt"
+	"os/exec"
+	"runtime"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/manzanita-research/caspar/pkg/ghost"
@@ -49,6 +52,66 @@ func loadDashboard(client *ghost.Client) tea.Cmd {
 		}
 		return msg
 	}
+}
+
+func togglePostStatus(client *ghost.Client, postID string) tea.Cmd {
+	return func() tea.Msg {
+		// Fetch current post for updated_at (Ghost 409 conflict resolution).
+		current, err := client.GetPost(postID, ghost.ListParams{})
+		if err != nil {
+			return postToggleErrMsg{fmt.Errorf("fetching post: %w", err)}
+		}
+
+		if current.Status == "scheduled" {
+			return postToggleErrMsg{fmt.Errorf("cannot toggle scheduled posts")}
+		}
+
+		var newStatus string
+		if current.Status == "published" {
+			newStatus = "draft"
+		} else {
+			newStatus = "published"
+		}
+
+		updatedAt := ""
+		if current.UpdatedAt != nil {
+			updatedAt = current.UpdatedAt.Format("2006-01-02T15:04:05.000Z")
+		}
+
+		updated, err := client.UpdatePost(postID, ghost.UpdatePostInput{
+			Status:    &newStatus,
+			UpdatedAt: updatedAt,
+		}, false)
+		if err != nil {
+			return postToggleErrMsg{fmt.Errorf("updating post: %w", err)}
+		}
+
+		return postToggledMsg{post: *updated}
+	}
+}
+
+func openInBrowser(url string) tea.Cmd {
+	return func() tea.Msg {
+		var cmd *exec.Cmd
+		switch runtime.GOOS {
+		case "darwin":
+			cmd = exec.Command("open", url)
+		case "linux":
+			cmd = exec.Command("xdg-open", url)
+		case "windows":
+			cmd = exec.Command("cmd", "/c", "start", url)
+		default:
+			cmd = exec.Command("xdg-open", url)
+		}
+		_ = cmd.Start()
+		return nil
+	}
+}
+
+func openGhostEditor(baseURL, postID string) tea.Cmd {
+	// Construct the Ghost admin editor URL.
+	editorURL := strings.TrimRight(baseURL, "/") + "/ghost/#/editor/post/" + postID
+	return openInBrowser(editorURL)
 }
 
 func loadPosts(client *ghost.Client, page int, statusFilter, nqlFilter string) tea.Cmd {

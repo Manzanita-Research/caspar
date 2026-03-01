@@ -44,6 +44,10 @@ type model struct {
 	loading      bool
 	selected     int
 
+	// Status feedback.
+	statusMsg string
+	statusErr string
+
 	// Help.
 	help help.Model
 }
