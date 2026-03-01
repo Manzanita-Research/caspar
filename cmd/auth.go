@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/huh"
-	"github.com/manzanita-research/ghostctl/pkg/config"
-	"github.com/manzanita-research/ghostctl/pkg/ghost"
-	"github.com/manzanita-research/ghostctl/pkg/output"
+	"github.com/manzanita-research/caspar/pkg/config"
+	"github.com/manzanita-research/caspar/pkg/ghost"
+	"github.com/manzanita-research/caspar/pkg/output"
 	"github.com/spf13/cobra"
 )
 
@@ -114,7 +114,7 @@ func runAuthStatus(cmd *cobra.Command, args []string) error {
 		if jsonOut {
 			return output.JSON(map[string]string{"status": "not authenticated"})
 		}
-		output.Error("Not logged in — run `ghostctl auth login`")
+		output.Error("Not logged in — run `caspar auth login`")
 		return nil
 	}
 

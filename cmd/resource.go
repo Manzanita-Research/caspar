@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/manzanita-research/ghostctl/pkg/config"
-	"github.com/manzanita-research/ghostctl/pkg/ghost"
-	"github.com/manzanita-research/ghostctl/pkg/output"
+	"github.com/manzanita-research/caspar/pkg/config"
+	"github.com/manzanita-research/caspar/pkg/ghost"
+	"github.com/manzanita-research/caspar/pkg/output"
 	"github.com/spf13/cobra"
 )
 
@@ -370,7 +370,7 @@ func makeDeleteFn(kind resourceKind) func(*cobra.Command, []string) error {
 
 		id := args[0]
 		if !ghost.IsID(id) {
-			return fmt.Errorf("delete requires a %s ID, not a slug — use `ghostctl %s get <slug>` to find the ID", kind, kind)
+			return fmt.Errorf("delete requires a %s ID, not a slug — use `caspar %s get <slug>` to find the ID", kind, kind)
 		}
 
 		if kind == kindPost {

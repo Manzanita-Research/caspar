@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/manzanita-research/ghostctl/pkg/output"
+	"github.com/manzanita-research/caspar/pkg/output"
 	"github.com/spf13/cobra"
 )
 

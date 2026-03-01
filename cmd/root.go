@@ -13,8 +13,8 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "ghostctl",
-	Short: "A Claude-first CLI for Ghost CMS",
+	Use:   "caspar",
+	Short: "The friendly Ghost CLI",
 	Long:  "A clean Go CLI for Ghost CMS. Agents are the primary user — humans are welcome too.",
 }
 

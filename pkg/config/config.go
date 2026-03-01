@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const configFileName = ".ghostctl.json"
+const configFileName = ".caspar.json"
 
 type Config struct {
 	URL         string `json:"url"`
@@ -24,8 +24,8 @@ func Path() (string, error) {
 
 func Load() (*Config, error) {
 	// env vars override everything
-	url := os.Getenv("GHOSTCTL_URL")
-	key := os.Getenv("GHOSTCTL_ADMIN_API_KEY")
+	url := os.Getenv("CASPAR_URL")
+	key := os.Getenv("CASPAR_ADMIN_API_KEY")
 	if url != "" && key != "" {
 		return &Config{URL: url, AdminAPIKey: key}, nil
 	}
@@ -38,7 +38,7 @@ func Load() (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("not logged in — run `ghostctl auth login` first")
+			return nil, fmt.Errorf("not logged in — run `caspar auth login` first")
 		}
 		return nil, fmt.Errorf("reading config: %w", err)
 	}
@@ -57,7 +57,7 @@ func Load() (*Config, error) {
 	}
 
 	if cfg.URL == "" || cfg.AdminAPIKey == "" {
-		return nil, fmt.Errorf("incomplete config — run `ghostctl auth login`")
+		return nil, fmt.Errorf("incomplete config — run `caspar auth login`")
 	}
 
 	return &cfg, nil

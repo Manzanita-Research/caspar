@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/manzanita-research/ghostctl/pkg/ghost"
-	"github.com/manzanita-research/ghostctl/pkg/output"
+	"github.com/manzanita-research/caspar/pkg/ghost"
+	"github.com/manzanita-research/caspar/pkg/output"
 	"github.com/spf13/cobra"
 )
 
@@ -159,7 +159,7 @@ var tagDeleteCmd = &cobra.Command{
 		}
 		id := args[0]
 		if !ghost.IsID(id) {
-			return fmt.Errorf("delete requires a tag ID, not a slug — use `ghostctl tag get <slug>` to find the ID")
+			return fmt.Errorf("delete requires a tag ID, not a slug — use `caspar tag get <slug>` to find the ID")
 		}
 		if err := client.DeleteTag(id); err != nil {
 			return err

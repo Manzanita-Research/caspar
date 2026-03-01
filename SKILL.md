@@ -1,31 +1,31 @@
-# ghostctl
+# caspar
 
 CLI for Ghost CMS. Use `--json` for structured output. Use `--fields` to limit response size.
 
 ## Auth
 
 ```sh
-ghostctl auth login   # interactive setup
-ghostctl auth status  # check connection
+caspar auth login   # interactive setup
+caspar auth status  # check connection
 ```
 
-Env vars `GHOSTCTL_URL` and `GHOSTCTL_ADMIN_API_KEY` override saved config.
+Env vars `CASPAR_URL` and `CASPAR_ADMIN_API_KEY` override saved config.
 
 ## Commands
 
 ```
-ghostctl post list [--limit N] [--filter EXPR] [--fields F] [--order O] [--include tags,authors] [--json]
-ghostctl post get <id-or-slug> [--fields F] [--include tags,authors] [--json]
-ghostctl post create --title T [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--featured] [--json]
-ghostctl post update <id-or-slug> [--title T] [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--json]
-ghostctl post delete <id> [--json]
+caspar post list [--limit N] [--filter EXPR] [--fields F] [--order O] [--include tags,authors] [--json]
+caspar post get <id-or-slug> [--fields F] [--include tags,authors] [--json]
+caspar post create --title T [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--featured] [--json]
+caspar post update <id-or-slug> [--title T] [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--json]
+caspar post delete <id> [--json]
 
-ghostctl page   — same subcommands as post
-ghostctl tag    list|get|create|update|delete
-ghostctl member list|get|create|update
-ghostctl newsletter list|get
-ghostctl image  upload <file> [--json]
-ghostctl site   [--json]
+caspar page   — same subcommands as post
+caspar tag    list|get|create|update|delete
+caspar member list|get|create|update
+caspar newsletter list|get
+caspar image  upload <file> [--json]
+caspar site   [--json]
 ```
 
 Aliases: `list→ls` `get→show` `create→new` `update→edit` `delete→rm`
@@ -43,14 +43,14 @@ Aliases: `list→ls` `get→show` `create→new` `update→edit` `delete→rm`
 
 ```sh
 # list recent drafts
-ghostctl post list --filter "status:draft" --order "updated_at desc" --limit 5 --json
+caspar post list --filter "status:draft" --order "updated_at desc" --limit 5 --json
 
 # create draft from stdin
-echo "<p>Content here</p>" | ghostctl post create --title "New Post" --stdin --json
+echo "<p>Content here</p>" | caspar post create --title "New Post" --stdin --json
 
 # publish a draft
-ghostctl post update <id-or-slug> --status published --json
+caspar post update <id-or-slug> --status published --json
 
 # efficient listing for token savings
-ghostctl post list --json --fields id,title,slug,status --limit 20
+caspar post list --json --fields id,title,slug,status --limit 20
 ```

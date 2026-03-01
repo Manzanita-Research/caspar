@@ -1,4 +1,4 @@
-module github.com/manzanita-research/ghostctl
+module github.com/manzanita-research/caspar
 
 go 1.24.4
 

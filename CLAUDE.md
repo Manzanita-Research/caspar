@@ -1,20 +1,20 @@
-# ghostctl
+# caspar
 
 Go CLI for Ghost CMS. Claude-first — agents are the primary user.
 
 ## Dev
 
 ```sh
-go build -o ghostctl .   # build
-go test ./...            # test
-make build               # same as above, plus install
+go build -o caspar .   # build
+go test ./...           # test
+make build              # same as above, plus install
 ```
 
 ## Structure
 
 - `cmd/` — cobra commands. `resource.go` has shared post/page logic.
 - `pkg/ghost/` — API client, JWT auth, types for each resource.
-- `pkg/config/` — `~/.ghostctl.json` management.
+- `pkg/config/` — `~/.caspar.json` management.
 - `pkg/output/` — JSON vs lipgloss-styled output.
 
 ## Conventions

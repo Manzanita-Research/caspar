@@ -1,38 +1,40 @@
-# ghostctl
+# caspar
 
-A Claude-first CLI for Ghost CMS. Agents are the primary user — humans are welcome too.
+The friendly Ghost CLI. Agents are the primary user — humans are welcome too.
+
+Named after Caspar, the tiny town in Mendocino County, California — and yeah, the friendly ghost too.
 
 ## Why
 
-Ghost has no good agent-friendly interface. The existing MCP server dumps 34 tool definitions into your context window, requires Node.js, and is brittle to set up. ghostctl takes a different approach: a clean Go CLI that Claude shells out to, with a [SKILL.md](./SKILL.md) that costs ~400 tokens instead of ~4000.
+Ghost has no good agent-friendly interface. The existing MCP server dumps 34 tool definitions into your context window, requires Node.js, and is brittle to set up. Caspar takes a different approach: a clean Go CLI that Claude shells out to, with a [SKILL.md](./SKILL.md) that costs ~400 tokens instead of ~4000.
 
 Built on the [linctl](https://github.com/dorkitude/linctl) pattern.
 
 ## Install
 
 ```sh
-go install github.com/manzanita-research/ghostctl@latest
+go install github.com/manzanita-research/caspar@latest
 ```
 
 ## Setup
 
 ```sh
-ghostctl auth login
+caspar auth login
 ```
 
-Prompts for your Ghost site URL and admin API key, validates the connection, and saves config to `~/.ghostctl.json`.
+Prompts for your Ghost site URL and admin API key, validates the connection, and saves config to `~/.caspar.json`.
 
 You can also set environment variables:
 
 ```sh
-export GHOSTCTL_URL=https://your-site.ghost.io
-export GHOSTCTL_ADMIN_API_KEY=your-id:your-secret
+export CASPAR_URL=https://your-site.ghost.io
+export CASPAR_ADMIN_API_KEY=your-id:your-secret
 ```
 
 ## Usage
 
 ```
-ghostctl
+caspar
 ├── auth login|status|logout
 ├── site
 ├── post list|get|create|update|delete
@@ -48,13 +50,13 @@ ghostctl
 Pass `--json` for structured output. Use `--fields` to request only what you need and keep token costs low.
 
 ```sh
-ghostctl post list --json --fields id,title,slug,status --limit 10
+caspar post list --json --fields id,title,slug,status --limit 10
 ```
 
 Pipe content in with `--stdin` to avoid putting HTML in flag values:
 
 ```sh
-echo "<p>Hello world</p>" | ghostctl post create --title "New Post" --stdin --json
+echo "<p>Hello world</p>" | caspar post create --title "New Post" --stdin --json
 ```
 
 ### For humans
@@ -62,9 +64,9 @@ echo "<p>Hello world</p>" | ghostctl post create --title "New Post" --stdin --js
 Without `--json`, output is styled with [Charm](https://charm.sh) — tables, colors, the works.
 
 ```sh
-ghostctl post list --limit 10
-ghostctl post get my-post-slug
-ghostctl tag list
+caspar post list --limit 10
+caspar post get my-post-slug
+caspar tag list
 ```
 
 ### Common flags
@@ -84,7 +86,7 @@ ghostctl tag list
 
 ## Agent integration
 
-Drop [SKILL.md](./SKILL.md) into your `.claude/skills/` directory. Claude reads it once (~400 tokens), then knows how to use ghostctl for any Ghost content task.
+Drop [SKILL.md](./SKILL.md) into your `.claude/skills/` directory. Claude reads it once (~400 tokens), then knows how to use caspar for any Ghost content task.
 
 ## Status
 
