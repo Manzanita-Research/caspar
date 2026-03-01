@@ -26,6 +26,10 @@ func dashboardUpdate(m model, msg tea.Msg) (model, tea.Cmd) {
 			m.currentView = viewPostList
 			m.loading = true
 			return m, loadPosts(m.client, 1, m.statusFilter, "")
+		case key.Matches(msg, keys.Pages):
+			m.currentView = viewPageList
+			m.loading = true
+			return m, loadPages(m.client, 1, statusFilters[m.pageStatusIdx], "")
 		}
 	}
 	return m, nil

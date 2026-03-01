@@ -19,6 +19,11 @@ type postDetailMsg struct {
 	post ghost.Post
 }
 
+type pagesLoadedMsg struct {
+	pages      []ghost.Page
+	pagination *ghost.Pagination
+}
+
 type errMsg struct {
 	err error
 }

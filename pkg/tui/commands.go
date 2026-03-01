@@ -63,6 +63,35 @@ func loadPostDetail(client *ghost.Client, id string) tea.Cmd {
 	}
 }
 
+func loadPages(client *ghost.Client, page int, statusFilter, nqlFilter string) tea.Cmd {
+	return func() tea.Msg {
+		filter := ""
+		if statusFilter != "all" {
+			filter = "status:" + statusFilter
+		}
+		if nqlFilter != "" {
+			if filter != "" {
+				filter += "+" + nqlFilter
+			} else {
+				filter = nqlFilter
+			}
+		}
+
+		params := ghost.ListParams{
+			Limit:   15,
+			Page:    page,
+			Filter:  filter,
+			Include: "tags",
+		}
+
+		pages, pag, err := client.ListPages(params)
+		if err != nil {
+			return errMsg{fmt.Errorf("loading pages: %w", err)}
+		}
+		return pagesLoadedMsg{pages: pages, pagination: pag}
+	}
+}
+
 func loadPosts(client *ghost.Client, page int, statusFilter, nqlFilter string) tea.Cmd {
 	return func() tea.Msg {
 		filter := ""

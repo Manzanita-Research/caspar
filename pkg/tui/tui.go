@@ -16,6 +16,7 @@ const (
 	viewDashboard view = iota
 	viewPostList
 	viewPostDetail
+	viewPageList
 )
 
 type model struct {
@@ -49,6 +50,15 @@ type model struct {
 	detailPost    *ghost.Post
 	detailContent string
 
+	// Page list.
+	pages         []ghost.Page
+	pagePag       *ghost.Pagination
+	pageCursor    int
+	pageExpanded  int
+	pageStatusIdx int
+	pageFilter    string
+	pageFiltering bool
+
 	// Help.
 	help help.Model
 }
@@ -75,6 +85,7 @@ func initialModel(client *ghost.Client, startView view) model {
 		statusFilter: "all",
 		filterInput:  ti,
 		selected:     -1,
+		pageExpanded: -1,
 		loading:      true,
 		help:         h,
 	}
@@ -103,7 +114,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
-		if !m.filtering && msg.String() == "q" {
+		if !m.filtering && !m.pageFiltering && msg.String() == "q" {
 			return m, tea.Quit
 		}
 		if msg.String() == "ctrl+c" {
@@ -118,6 +129,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return postListUpdate(m, msg)
 	case viewPostDetail:
 		return postDetailUpdate(m, msg)
+	case viewPageList:
+		return pageListUpdate(m, msg)
 	}
 
 	return m, nil
@@ -136,6 +149,8 @@ func (m model) View() string {
 		return postListView(m)
 	case viewPostDetail:
 		return postDetailView(m)
+	case viewPageList:
+		return pageListView(m)
 	}
 
 	return ""

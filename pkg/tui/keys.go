@@ -5,6 +5,7 @@ import "github.com/charmbracelet/bubbles/key"
 type keyMap struct {
 	Quit     key.Binding
 	Posts    key.Binding
+	Pages    key.Binding
 	Up       key.Binding
 	Down     key.Binding
 	Enter    key.Binding
@@ -23,6 +24,10 @@ var keys = keyMap{
 	Posts: key.NewBinding(
 		key.WithKeys("p"),
 		key.WithHelp("p", "posts"),
+	),
+	Pages: key.NewBinding(
+		key.WithKeys("a"),
+		key.WithHelp("a", "pages"),
 	),
 	Up: key.NewBinding(
 		key.WithKeys("k", "up"),
@@ -61,11 +66,11 @@ var keys = keyMap{
 type dashboardKeys struct{}
 
 func (dashboardKeys) ShortHelp() []key.Binding {
-	return []key.Binding{keys.Posts, keys.Quit}
+	return []key.Binding{keys.Posts, keys.Pages, keys.Quit}
 }
 
 func (dashboardKeys) FullHelp() [][]key.Binding {
-	return [][]key.Binding{{keys.Posts, keys.Quit}}
+	return [][]key.Binding{{keys.Posts, keys.Pages, keys.Quit}}
 }
 
 // postListKeys is the help.KeyMap for the post list view.
@@ -93,4 +98,20 @@ func (postDetailKeys) ShortHelp() []key.Binding {
 
 func (postDetailKeys) FullHelp() [][]key.Binding {
 	return [][]key.Binding{{keys.Escape, keys.Quit}}
+}
+
+// pageListKeys is the help.KeyMap for the page list view.
+type pageListKeys struct {
+	escape key.Binding
+}
+
+func (k pageListKeys) ShortHelp() []key.Binding {
+	return []key.Binding{
+		keys.Up, keys.Down, keys.Enter, keys.Tab,
+		keys.Filter, keys.NextPage, k.escape, keys.Quit,
+	}
+}
+
+func (k pageListKeys) FullHelp() [][]key.Binding {
+	return [][]key.Binding{k.ShortHelp()}
 }
