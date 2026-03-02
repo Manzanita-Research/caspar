@@ -45,6 +45,8 @@ type model struct {
 	statusFilter string
 	filterInput  textinput.Model
 	filtering    bool
+	searching    bool
+	searchQuery  string
 	loading      bool
 	selected     int
 
@@ -134,7 +136,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
-		if !m.filtering && !m.pageFiltering && msg.String() == "q" {
+		if !m.filtering && !m.pageFiltering && !m.searching && msg.String() == "q" {
 			return m, tea.Quit
 		}
 		if msg.String() == "ctrl+c" {
