@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -142,6 +143,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.String() == "ctrl+c" {
 			return m, tea.Quit
 		}
+
+		// Global tab navigation — switch between list views from anywhere
+		// (except when in text input mode).
+		if !m.filtering && !m.pageFiltering && !m.searching {
+			if cmd, ok := handleTabSwitch(&m, msg); ok {
+				return m, cmd
+			}
+		}
 	}
 
 	switch m.currentView {
@@ -192,6 +201,28 @@ func (m model) contentWidth() int {
 		w = maxWidth
 	}
 	return w
+}
+
+func handleTabSwitch(m *model, msg tea.KeyMsg) (tea.Cmd, bool) {
+	switch {
+	case key.Matches(msg, keys.Posts) && m.currentView != viewPostList && m.currentView != viewPostDetail:
+		m.currentView = viewPostList
+		m.loading = true
+		return loadPosts(m.client, 1, m.statusFilter, ""), true
+	case key.Matches(msg, keys.Pages) && m.currentView != viewPageList:
+		m.currentView = viewPageList
+		m.loading = true
+		return loadPages(m.client, 1, statusFilters[m.pageStatusIdx], ""), true
+	case key.Matches(msg, keys.Tags) && m.currentView != viewTagList:
+		m.currentView = viewTagList
+		m.loading = true
+		return loadTags(m.client, 1), true
+	case key.Matches(msg, keys.Members) && m.currentView != viewMemberList:
+		m.currentView = viewMemberList
+		m.loading = true
+		return loadMembers(m.client, 1), true
+	}
+	return nil, false
 }
 
 // Run starts the TUI.

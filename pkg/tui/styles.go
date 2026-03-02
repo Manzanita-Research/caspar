@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/manzanita-research/caspar/pkg/ghost"
 )
 
 // Manzanita brand palette — adaptive for light and dark terminals.
@@ -66,6 +67,47 @@ func statusIndicator(status string) string {
 	default:
 		return draftStyle.Render(statusDraft)
 	}
+}
+
+var (
+	activeTabStyle   = lipgloss.NewStyle().Bold(true).Foreground(accentColor)
+	inactiveTabStyle = lipgloss.NewStyle().Foreground(mutedColor)
+	tabKeyStyle      = lipgloss.NewStyle().Foreground(accentColor)
+	tabSepStyle      = lipgloss.NewStyle().Foreground(fogColor)
+	headerURLStyle   = lipgloss.NewStyle().Foreground(mutedColor)
+)
+
+type tab struct {
+	label string
+	key   string
+	view  view
+}
+
+var tabs = []tab{
+	{"Posts", "p", viewPostList},
+	{"Pages", "a", viewPageList},
+	{"Tags", "t", viewTagList},
+	{"Members", "m", viewMemberList},
+}
+
+func siteHeader(site *ghost.SiteInfo) string {
+	if site == nil {
+		return ""
+	}
+	return "  " + titleStyle.Render(site.Title) + "  " + headerURLStyle.Render(site.URL) + "\n"
+}
+
+func tabBar(current view) string {
+	var parts []string
+	for _, t := range tabs {
+		hint := tabKeyStyle.Render("["+t.key+"]") + " "
+		if t.view == current {
+			parts = append(parts, hint+activeTabStyle.Render(t.label))
+		} else {
+			parts = append(parts, hint+inactiveTabStyle.Render(t.label))
+		}
+	}
+	return "  " + strings.Join(parts, tabSepStyle.Render("  "))
 }
 
 func indent(s string) string {

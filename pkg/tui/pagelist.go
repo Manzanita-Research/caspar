@@ -110,14 +110,15 @@ func pageListView(m model) string {
 	w := m.contentWidth()
 
 	b.WriteString("\n")
+	b.WriteString(siteHeader(m.site))
+	b.WriteString(tabBar(viewPageList))
+	b.WriteString("\n\n")
 
-	// Header.
-	header := "Pages"
+	// Status filter label.
 	if sf := m.pageStatusFilter(); sf != "all" {
-		header += " " + labelStyle.Render("("+sf+")")
+		b.WriteString(indent(labelStyle.Render("(" + sf + ")")))
+		b.WriteString("\n")
 	}
-	b.WriteString(indent(titleStyle.Render(header)))
-	b.WriteString("\n")
 
 	// Active filter display.
 	if m.filterInput.Value() != "" {

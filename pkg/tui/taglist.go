@@ -76,7 +76,8 @@ func tagListView(m model) string {
 	w := m.contentWidth()
 
 	b.WriteString("\n")
-	b.WriteString(indent(titleStyle.Render("Tags")))
+	b.WriteString(siteHeader(m.site))
+	b.WriteString(tabBar(viewTagList))
 	b.WriteString("\n\n")
 
 	if m.loading {

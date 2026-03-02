@@ -221,14 +221,15 @@ func postListView(m model) string {
 	w := m.contentWidth()
 
 	b.WriteString("\n")
+	b.WriteString(siteHeader(m.site))
+	b.WriteString(tabBar(viewPostList))
+	b.WriteString("\n\n")
 
-	// Header.
-	header := "Posts"
+	// Status filter label.
 	if m.statusFilter != "all" {
-		header += " " + labelStyle.Render("("+m.statusFilter+")")
+		b.WriteString(indent(labelStyle.Render("(" + m.statusFilter + ")")))
+		b.WriteString("\n")
 	}
-	b.WriteString(indent(titleStyle.Render(header)))
-	b.WriteString("\n")
 
 	// Active filter display.
 	if !m.searching && m.filterInput.Value() != "" {
