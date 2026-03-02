@@ -37,3 +37,11 @@ type membersLoadedMsg struct {
 type errMsg struct {
 	err error
 }
+
+type postToggledMsg struct {
+	post ghost.Post
+}
+
+type postToggleErrMsg struct {
+	err error
+}

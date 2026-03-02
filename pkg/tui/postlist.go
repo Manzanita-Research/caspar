@@ -21,7 +21,29 @@ func postListUpdate(m model, msg tea.Msg) (model, tea.Cmd) {
 		m.selected = -1
 		return m, nil
 
+	case postToggledMsg:
+		m.loading = false
+		newStatus := msg.post.Status
+		if newStatus == "published" {
+			m.statusMsg = "post published"
+		} else {
+			m.statusMsg = "post set to draft"
+		}
+		m.statusErr = ""
+		// Reload posts to reflect the change.
+		return m, loadPosts(m.client, 1, m.statusFilter, m.filterInput.Value())
+
+	case postToggleErrMsg:
+		m.loading = false
+		m.statusErr = msg.err.Error()
+		m.statusMsg = ""
+		return m, nil
+
 	case tea.KeyMsg:
+		// Clear status messages on any key press.
+		m.statusMsg = ""
+		m.statusErr = ""
+
 		// When filtering, route keys to the text input.
 		if m.filtering {
 			switch {
@@ -108,6 +130,43 @@ func postListUpdate(m model, msg tea.Msg) (model, tea.Cmd) {
 				return m, loadPosts(m.client, *m.postPag.Prev, m.statusFilter, m.filterInput.Value())
 			}
 			return m, nil
+
+		case key.Matches(msg, keys.Edit):
+			if len(m.posts) > 0 && m.cursor < len(m.posts) {
+				p := m.posts[m.cursor]
+				m.statusMsg = ""
+				m.statusErr = ""
+				return m, openGhostEditor(m.client.BaseURL, p.ID)
+			}
+			return m, nil
+
+		case key.Matches(msg, keys.Open):
+			if len(m.posts) > 0 && m.cursor < len(m.posts) {
+				p := m.posts[m.cursor]
+				if p.URL != "" {
+					m.statusMsg = ""
+					m.statusErr = ""
+					return m, openInBrowser(p.URL)
+				}
+				m.statusErr = "no URL for this post"
+				return m, nil
+			}
+			return m, nil
+
+		case key.Matches(msg, keys.Toggle):
+			if len(m.posts) > 0 && m.cursor < len(m.posts) {
+				p := m.posts[m.cursor]
+				if p.Status == "scheduled" {
+					m.statusErr = "cannot toggle scheduled posts"
+					m.statusMsg = ""
+					return m, nil
+				}
+				m.statusMsg = ""
+				m.statusErr = ""
+				m.loading = true
+				return m, togglePostStatus(m.client, p.ID)
+			}
+			return m, nil
 		}
 	}
 	return m, nil
@@ -182,6 +241,16 @@ func postListView(m model) string {
 	// Filter input.
 	if m.filtering {
 		b.WriteString(indent(filterPromptStyle.Render("/ ") + m.filterInput.View()))
+		b.WriteString("\n\n")
+	}
+
+	// Status feedback.
+	if m.statusMsg != "" {
+		b.WriteString(indent(publishedStyle.Render(m.statusMsg)))
+		b.WriteString("\n\n")
+	}
+	if m.statusErr != "" {
+		b.WriteString(indent(errStyle.Render(m.statusErr)))
 		b.WriteString("\n\n")
 	}
 

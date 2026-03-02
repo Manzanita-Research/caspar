@@ -73,6 +73,10 @@ type model struct {
 	memberCursor   int
 	memberExpanded int
 
+	// Status feedback.
+	statusMsg string
+	statusErr string
+
 	// Help.
 	help help.Model
 }

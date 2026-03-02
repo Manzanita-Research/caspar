@@ -16,6 +16,9 @@ type keyMap struct {
 	Filter   key.Binding
 	NextPage key.Binding
 	PrevPage key.Binding
+	Edit     key.Binding
+	Open     key.Binding
+	Toggle   key.Binding
 }
 
 var keys = keyMap{
@@ -70,6 +73,18 @@ var keys = keyMap{
 	PrevPage: key.NewBinding(
 		key.WithKeys("N"),
 	),
+	Edit: key.NewBinding(
+		key.WithKeys("e"),
+		key.WithHelp("e", "edit"),
+	),
+	Open: key.NewBinding(
+		key.WithKeys("o"),
+		key.WithHelp("o", "open"),
+	),
+	Toggle: key.NewBinding(
+		key.WithKeys("d"),
+		key.WithHelp("d", "draft/publish"),
+	),
 }
 
 // dashboardKeys is the help.KeyMap for the dashboard view.
@@ -91,6 +106,7 @@ type postListKeys struct {
 func (k postListKeys) ShortHelp() []key.Binding {
 	return []key.Binding{
 		keys.Up, keys.Down, keys.Enter, keys.Tab,
+		keys.Edit, keys.Open, keys.Toggle,
 		keys.Filter, keys.NextPage, k.escape, keys.Quit,
 	}
 }
