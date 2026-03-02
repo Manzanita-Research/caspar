@@ -15,9 +15,9 @@ Env vars `CASPAR_URL` and `CASPAR_ADMIN_API_KEY` override saved config.
 
 ```
 caspar post list [--limit N] [--filter EXPR] [--fields F] [--order O] [--include tags,authors] [--json]
-caspar post get <id-or-slug> [--fields F] [--include tags,authors] [--json]
-caspar post create --title T [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--featured] [--published-at ISO8601] [--json]
-caspar post update <id-or-slug> [--title T] [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--published-at ISO8601] [--json]
+caspar post get <id-or-slug> [--fields F] [--include tags,authors] [--formats html] [--json]
+caspar post create --title T [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--featured] [--published-at ISO8601] [--visibility V] [--json]
+caspar post update <id-or-slug> [--title T] [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--published-at ISO8601] [--visibility V] [--custom-excerpt E] [--json]
 caspar post delete <id> [--json]
 
 caspar page   — same subcommands as post
@@ -41,8 +41,12 @@ Creating or publishing posts via caspar **never sends newsletter emails**. Ghost
 - `--stdin` reads HTML from stdin — use for long content instead of `--html` flag.
 - `--tag` is repeatable and replaces all existing tags on update.
 - `--published-at` sets the publication date (ISO 8601, e.g. `2017-04-25T00:00:00.000Z`). Works on both create and update.
+- `--visibility` controls who can see the post/page: `public`, `members`, `paid`, or `tiers`. Works on both create and update.
+- `--custom-excerpt` sets a custom excerpt for previews and cards (update only).
+- `--formats` on `get` requests specific content formats (e.g. `html`, `html+lexical`).
 - Updates fetch `updated_at` automatically for Ghost's 409 conflict resolution.
 - `--filter` uses Ghost NQL: `status:published`, `tag:getting-started`, `published_at:>'2024-01-01'`
+- Bulk fetch by IDs: `--filter "id:[id1,id2,id3]"` returns multiple posts/pages in one request.
 
 ## Common patterns
 
@@ -58,6 +62,9 @@ caspar post update <id-or-slug> --status published --json
 
 # set a publication date (e.g. migrating old content)
 caspar post update <id-or-slug> --published-at "2017-04-25T00:00:00.000Z" --json
+
+# make a post members-only
+caspar post update <id-or-slug> --visibility members --json
 
 # efficient listing for token savings
 caspar post list --json --fields id,title,slug,status --limit 20

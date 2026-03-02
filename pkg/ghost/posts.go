@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 var uuidRegex = regexp.MustCompile(`^[0-9a-f]{24}$`)
@@ -45,6 +46,9 @@ func (p ListParams) toValues() url.Values {
 	if p.Include != "" {
 		v.Set("include", p.Include)
 	}
+	if p.Formats != "" {
+		v.Set("formats", p.Formats)
+	}
 	return v
 }
 
@@ -67,6 +71,14 @@ func (c *Client) ListPosts(params ListParams) ([]Post, *Pagination, error) {
 	return resp.Posts, pag, nil
 }
 
+// GetPostsByIDs fetches multiple posts by ID in a single request.
+func (c *Client) GetPostsByIDs(ids []string, params ListParams) ([]Post, error) {
+	params.Filter = "id:[" + strings.Join(ids, ",") + "]"
+	params.Limit = len(ids)
+	posts, _, err := c.ListPosts(params)
+	return posts, err
+}
+
 // GetPost fetches a single post by ID or slug.
 func (c *Client) GetPost(idOrSlug string, params ListParams) (*Post, error) {
 	var path string
@@ -82,6 +94,9 @@ func (c *Client) GetPost(idOrSlug string, params ListParams) (*Post, error) {
 	}
 	if params.Include != "" {
 		v.Set("include", params.Include)
+	}
+	if params.Formats != "" {
+		v.Set("formats", params.Formats)
 	}
 
 	data, err := c.Get(path, v)
@@ -109,6 +124,7 @@ type CreatePostInput struct {
 	Tags        []string `json:"-"`
 	Featured    bool     `json:"featured,omitempty"`
 	PublishedAt string   `json:"-"` // ISO 8601 datetime
+	Visibility  string   `json:"-"`
 }
 
 type createPostRequest struct {
@@ -138,6 +154,9 @@ func (c *Client) CreatePost(input CreatePostInput, useHTML bool) (*Post, error) 
 	}
 	if input.PublishedAt != "" {
 		post["published_at"] = input.PublishedAt
+	}
+	if input.Visibility != "" {
+		post["visibility"] = input.Visibility
 	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))
@@ -180,9 +199,11 @@ type UpdatePostInput struct {
 	Status    *string  `json:"-"`
 	Slug      *string  `json:"-"`
 	Tags        []string `json:"-"`
-	Featured    *bool    `json:"-"`
-	PublishedAt *string  `json:"-"` // ISO 8601 datetime
-	UpdatedAt   string   `json:"-"` // required for conflict resolution
+	Featured      *bool    `json:"-"`
+	PublishedAt   *string  `json:"-"` // ISO 8601 datetime
+	Visibility    *string  `json:"-"`
+	CustomExcerpt *string  `json:"-"`
+	UpdatedAt     string   `json:"-"` // required for conflict resolution
 }
 
 // UpdatePost updates an existing post. Requires the current updated_at for conflict detection.
@@ -211,6 +232,12 @@ func (c *Client) UpdatePost(id string, input UpdatePostInput, useHTML bool) (*Po
 	}
 	if input.PublishedAt != nil {
 		post["published_at"] = *input.PublishedAt
+	}
+	if input.Visibility != nil {
+		post["visibility"] = *input.Visibility
+	}
+	if input.CustomExcerpt != nil {
+		post["custom_excerpt"] = *input.CustomExcerpt
 	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))

@@ -21,6 +21,7 @@ type Post struct {
 	CreatedAt   *time.Time `json:"created_at,omitempty"`
 	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
 	PublishedAt *time.Time `json:"published_at,omitempty"`
+	Visibility  string     `json:"visibility,omitempty"`
 }
 
 // Page has the same shape as a Post in the Ghost API.
@@ -95,4 +96,5 @@ type ListParams struct {
 	Order   string
 	Fields  string
 	Include string
+	Formats string
 }

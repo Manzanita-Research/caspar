@@ -58,6 +58,7 @@ func buildResourceCommands(kind resourceKind) *cobra.Command {
 	}
 	getCmd.Flags().String("fields", "", "comma-separated fields to include")
 	getCmd.Flags().String("include", "", "related resources to include (e.g. tags,authors)")
+	getCmd.Flags().String("formats", "", "content formats to include (e.g. html, html+lexical)")
 	root.AddCommand(getCmd)
 
 	// --- create ---
@@ -112,6 +113,7 @@ func addCreateFlags(cmd *cobra.Command) {
 	cmd.Flags().StringSlice("tag", nil, "tag name (repeatable)")
 	cmd.Flags().Bool("featured", false, "mark as featured")
 	cmd.Flags().String("published-at", "", "publication date (ISO 8601, e.g. 2017-04-25T00:00:00.000Z)")
+	cmd.Flags().String("visibility", "", "visibility (public, members, paid, tiers)")
 	cmd.Flags().Bool("stdin", false, "read HTML content from stdin")
 	_ = cmd.MarkFlagRequired("title")
 }
@@ -126,6 +128,8 @@ func addUpdateFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("featured", false, "mark as featured")
 	cmd.Flags().Bool("no-featured", false, "unmark as featured")
 	cmd.Flags().String("published-at", "", "publication date (ISO 8601, e.g. 2017-04-25T00:00:00.000Z)")
+	cmd.Flags().String("visibility", "", "new visibility (public, members, paid, tiers)")
+	cmd.Flags().String("custom-excerpt", "", "custom excerpt for previews and cards")
 	cmd.Flags().Bool("stdin", false, "read HTML content from stdin")
 }
 
@@ -183,7 +187,8 @@ func makeGetFn(kind resourceKind) func(*cobra.Command, []string) error {
 
 		fields, _ := cmd.Flags().GetString("fields")
 		include, _ := cmd.Flags().GetString("include")
-		params := ghost.ListParams{Fields: fields, Include: include}
+		formats, _ := cmd.Flags().GetString("formats")
+		params := ghost.ListParams{Fields: fields, Include: include, Formats: formats}
 
 		if kind == kindPost {
 			post, err := client.GetPost(args[0], params)
@@ -230,6 +235,7 @@ func makeCreateFn(kind resourceKind) func(*cobra.Command, []string) error {
 		}
 
 		publishedAt, _ := cmd.Flags().GetString("published-at")
+		visibility, _ := cmd.Flags().GetString("visibility")
 
 		input := ghost.CreatePostInput{
 			Title:       title,
@@ -240,6 +246,7 @@ func makeCreateFn(kind resourceKind) func(*cobra.Command, []string) error {
 			Tags:        tags,
 			Featured:    featured,
 			PublishedAt: publishedAt,
+			Visibility:  visibility,
 		}
 
 		useHTML := html != ""
@@ -328,6 +335,14 @@ func makeUpdateFn(kind resourceKind) func(*cobra.Command, []string) error {
 		if cmd.Flags().Changed("published-at") {
 			v, _ := cmd.Flags().GetString("published-at")
 			input.PublishedAt = &v
+		}
+		if cmd.Flags().Changed("visibility") {
+			v, _ := cmd.Flags().GetString("visibility")
+			input.Visibility = &v
+		}
+		if cmd.Flags().Changed("custom-excerpt") {
+			v, _ := cmd.Flags().GetString("custom-excerpt")
+			input.CustomExcerpt = &v
 		}
 
 		useStdin, _ := cmd.Flags().GetBool("stdin")
@@ -422,6 +437,9 @@ func printPostDetail(p *ghost.Post) {
 	output.Field("ID", p.ID)
 	output.Field("Slug", p.Slug)
 	output.Field("Status", p.Status)
+	if p.Visibility != "" {
+		output.Field("Visibility", p.Visibility)
+	}
 	if p.URL != "" {
 		output.Field("URL", p.URL)
 	}

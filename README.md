@@ -78,6 +78,9 @@ caspar tag list
 | `--limit` | Number of results |
 | `--filter` | Ghost NQL filter expression |
 | `--order` | Sort order |
+| `--formats` | Content formats on `get` (e.g. `html`) |
+| `--visibility` | Access control: `public`, `members`, `paid`, `tiers` |
+| `--custom-excerpt` | Custom excerpt for previews and cards |
 | `--stdin` | Read content from stdin |
 
 ### Aliases

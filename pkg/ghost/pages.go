@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type pagesResponse struct {
@@ -31,6 +32,14 @@ func (c *Client) ListPages(params ListParams) ([]Page, *Pagination, error) {
 	return resp.Pages, pag, nil
 }
 
+// GetPagesByIDs fetches multiple pages by ID in a single request.
+func (c *Client) GetPagesByIDs(ids []string, params ListParams) ([]Page, error) {
+	params.Filter = "id:[" + strings.Join(ids, ",") + "]"
+	params.Limit = len(ids)
+	pages, _, err := c.ListPages(params)
+	return pages, err
+}
+
 // GetPage fetches a single page by ID or slug.
 func (c *Client) GetPage(idOrSlug string, params ListParams) (*Page, error) {
 	var path string
@@ -46,6 +55,9 @@ func (c *Client) GetPage(idOrSlug string, params ListParams) (*Page, error) {
 	}
 	if params.Include != "" {
 		v.Set("include", params.Include)
+	}
+	if params.Formats != "" {
+		v.Set("formats", params.Formats)
 	}
 
 	data, err := c.Get(path, v)
@@ -86,6 +98,9 @@ func (c *Client) CreatePage(input CreatePostInput, useHTML bool) (*Page, error) 
 	}
 	if input.PublishedAt != "" {
 		post["published_at"] = input.PublishedAt
+	}
+	if input.Visibility != "" {
+		post["visibility"] = input.Visibility
 	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))
@@ -146,6 +161,12 @@ func (c *Client) UpdatePage(id string, input UpdatePostInput, useHTML bool) (*Pa
 	}
 	if input.PublishedAt != nil {
 		page["published_at"] = *input.PublishedAt
+	}
+	if input.Visibility != nil {
+		page["visibility"] = *input.Visibility
+	}
+	if input.CustomExcerpt != nil {
+		page["custom_excerpt"] = *input.CustomExcerpt
 	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))
