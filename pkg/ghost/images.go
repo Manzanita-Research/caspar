@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"mime/multipart"
+	"net/textproto"
 	"os"
 	"path/filepath"
 )
@@ -25,7 +27,10 @@ func (c *Client) UploadImage(filePath string) (*ImageUpload, error) {
 	var buf bytes.Buffer
 	writer := multipart.NewWriter(&buf)
 
-	part, err := writer.CreateFormFile("file", filepath.Base(filePath))
+	h := make(textproto.MIMEHeader)
+	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filepath.Base(filePath)))
+	h.Set("Content-Type", mime.TypeByExtension(filepath.Ext(filePath)))
+	part, err := writer.CreatePart(h)
 	if err != nil {
 		return nil, fmt.Errorf("creating form file: %w", err)
 	}
