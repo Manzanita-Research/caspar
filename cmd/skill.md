@@ -16,8 +16,8 @@ Env vars `CASPAR_URL` and `CASPAR_ADMIN_API_KEY` override saved config.
 ```
 caspar post list [--limit N] [--filter EXPR] [--fields F] [--order O] [--include tags,authors] [--json]
 caspar post get <id-or-slug> [--fields F] [--include tags,authors] [--json]
-caspar post create --title T [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--featured] [--json]
-caspar post update <id-or-slug> [--title T] [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--json]
+caspar post create --title T [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--featured] [--published-at ISO8601] [--json]
+caspar post update <id-or-slug> [--title T] [--html H | --stdin] [--status S] [--slug S] [--tag T]... [--published-at ISO8601] [--json]
 caspar post delete <id> [--json]
 
 caspar page   — same subcommands as post
@@ -40,6 +40,7 @@ Creating or publishing posts via caspar **never sends newsletter emails**. Ghost
 - `--html` with create/update adds `?source=html` automatically.
 - `--stdin` reads HTML from stdin — use for long content instead of `--html` flag.
 - `--tag` is repeatable and replaces all existing tags on update.
+- `--published-at` sets the publication date (ISO 8601, e.g. `2017-04-25T00:00:00.000Z`). Works on both create and update.
 - Updates fetch `updated_at` automatically for Ghost's 409 conflict resolution.
 - `--filter` uses Ghost NQL: `status:published`, `tag:getting-started`, `published_at:>'2024-01-01'`
 
@@ -54,6 +55,9 @@ echo "<p>Content here</p>" | caspar post create --title "New Post" --stdin --jso
 
 # publish a draft
 caspar post update <id-or-slug> --status published --json
+
+# set a publication date (e.g. migrating old content)
+caspar post update <id-or-slug> --published-at "2017-04-25T00:00:00.000Z" --json
 
 # efficient listing for token savings
 caspar post list --json --fields id,title,slug,status --limit 20
