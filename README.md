@@ -6,7 +6,7 @@ Named after Caspar, the tiny town in Mendocino County, California — and yeah, 
 
 ## Why
 
-Ghost has no good agent-friendly interface. The existing MCP server dumps 34 tool definitions into your context window, requires Node.js, and is brittle to set up. Caspar takes a different approach: a clean Go CLI that Claude shells out to, with a [SKILL.md](./SKILL.md) that costs ~400 tokens instead of ~4000.
+Ghost has no good agent-friendly interface. The existing MCP server dumps 34 tool definitions into your context window, requires Node.js, and is brittle to set up. Caspar takes a different approach: a clean Go CLI that Claude shells out to, with a [skill file](./cmd/skill.md) that costs ~400 tokens instead of ~4000.
 
 Built on the [linctl](https://github.com/dorkitude/linctl) pattern.
 
@@ -86,7 +86,11 @@ caspar tag list
 
 ## Agent integration
 
-Drop [SKILL.md](./SKILL.md) into your `.claude/skills/` directory. Claude reads it once (~400 tokens), then knows how to use caspar for any Ghost content task.
+```sh
+caspar skill install
+```
+
+Copies the built-in [skill file](./cmd/skill.md) to `~/.claude/skills/caspar/SKILL.md`. Claude reads it once (~400 tokens), then knows how to use caspar for any Ghost content task.
 
 ## Status
 

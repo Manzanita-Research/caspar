@@ -30,6 +30,10 @@ caspar site   [--json]
 
 Aliases: `list→ls` `get→show` `create→new` `update→edit` `delete→rm`
 
+## Newsletter safety
+
+Creating or publishing posts via caspar **never sends newsletter emails**. Ghost's Admin API requires an explicit `newsletter` field in the request body to trigger email delivery, and caspar never sets it. Posts default to `draft` status. Even `--status published` just makes the post visible on the site — no emails go out. Bulk imports are safe.
+
 ## Gotchas
 
 - `get` auto-detects slug vs ID. `delete` requires an ID.
