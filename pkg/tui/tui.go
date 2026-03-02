@@ -17,6 +17,8 @@ const (
 	viewPostList
 	viewPostDetail
 	viewPageList
+	viewTagList
+	viewMemberList
 )
 
 type model struct {
@@ -59,6 +61,18 @@ type model struct {
 	pageFilter    string
 	pageFiltering bool
 
+	// Tag list.
+	tags        []ghost.Tag
+	tagPag      *ghost.Pagination
+	tagCursor   int
+	tagExpanded int
+
+	// Member list.
+	members        []ghost.Member
+	memberPag      *ghost.Pagination
+	memberCursor   int
+	memberExpanded int
+
 	// Help.
 	help help.Model
 }
@@ -84,10 +98,12 @@ func initialModel(client *ghost.Client, startView view) model {
 		client:       client,
 		statusFilter: "all",
 		filterInput:  ti,
-		selected:     -1,
-		pageExpanded: -1,
-		loading:      true,
-		help:         h,
+		selected:       -1,
+		pageExpanded:   -1,
+		tagExpanded:    -1,
+		memberExpanded: -1,
+		loading:        true,
+		help:           h,
 	}
 }
 
@@ -131,6 +147,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return postDetailUpdate(m, msg)
 	case viewPageList:
 		return pageListUpdate(m, msg)
+	case viewTagList:
+		return tagListUpdate(m, msg)
+	case viewMemberList:
+		return memberListUpdate(m, msg)
 	}
 
 	return m, nil
@@ -151,6 +171,10 @@ func (m model) View() string {
 		return postDetailView(m)
 	case viewPageList:
 		return pageListView(m)
+	case viewTagList:
+		return tagListView(m)
+	case viewMemberList:
+		return memberListView(m)
 	}
 
 	return ""
