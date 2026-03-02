@@ -84,6 +84,9 @@ func (c *Client) CreatePage(input CreatePostInput, useHTML bool) (*Page, error) 
 	if input.Featured {
 		post["featured"] = true
 	}
+	if input.PublishedAt != "" {
+		post["published_at"] = input.PublishedAt
+	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))
 		for i, t := range input.Tags {
@@ -140,6 +143,9 @@ func (c *Client) UpdatePage(id string, input UpdatePostInput, useHTML bool) (*Pa
 	}
 	if input.Featured != nil {
 		page["featured"] = *input.Featured
+	}
+	if input.PublishedAt != nil {
+		page["published_at"] = *input.PublishedAt
 	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))

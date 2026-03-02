@@ -111,6 +111,7 @@ func addCreateFlags(cmd *cobra.Command) {
 	cmd.Flags().String("slug", "", "custom slug")
 	cmd.Flags().StringSlice("tag", nil, "tag name (repeatable)")
 	cmd.Flags().Bool("featured", false, "mark as featured")
+	cmd.Flags().String("published-at", "", "publication date (ISO 8601, e.g. 2017-04-25T00:00:00.000Z)")
 	cmd.Flags().Bool("stdin", false, "read HTML content from stdin")
 	_ = cmd.MarkFlagRequired("title")
 }
@@ -124,6 +125,7 @@ func addUpdateFlags(cmd *cobra.Command) {
 	cmd.Flags().StringSlice("tag", nil, "tag name (repeatable, replaces existing)")
 	cmd.Flags().Bool("featured", false, "mark as featured")
 	cmd.Flags().Bool("no-featured", false, "unmark as featured")
+	cmd.Flags().String("published-at", "", "publication date (ISO 8601, e.g. 2017-04-25T00:00:00.000Z)")
 	cmd.Flags().Bool("stdin", false, "read HTML content from stdin")
 }
 
@@ -227,14 +229,17 @@ func makeCreateFn(kind resourceKind) func(*cobra.Command, []string) error {
 			html = string(data)
 		}
 
+		publishedAt, _ := cmd.Flags().GetString("published-at")
+
 		input := ghost.CreatePostInput{
-			Title:    title,
-			HTML:     html,
-			Lexical:  lexical,
-			Status:   status,
-			Slug:     slug,
-			Tags:     tags,
-			Featured: featured,
+			Title:       title,
+			HTML:        html,
+			Lexical:     lexical,
+			Status:      status,
+			Slug:        slug,
+			Tags:        tags,
+			Featured:    featured,
+			PublishedAt: publishedAt,
 		}
 
 		useHTML := html != ""
@@ -319,6 +324,10 @@ func makeUpdateFn(kind resourceKind) func(*cobra.Command, []string) error {
 		if cmd.Flags().Changed("no-featured") {
 			v := false
 			input.Featured = &v
+		}
+		if cmd.Flags().Changed("published-at") {
+			v, _ := cmd.Flags().GetString("published-at")
+			input.PublishedAt = &v
 		}
 
 		useStdin, _ := cmd.Flags().GetBool("stdin")

@@ -101,13 +101,14 @@ func (c *Client) GetPost(idOrSlug string, params ListParams) (*Post, error) {
 
 // CreatePostInput holds fields for creating a post.
 type CreatePostInput struct {
-	Title    string   `json:"title"`
-	HTML     string   `json:"html,omitempty"`
-	Lexical  string   `json:"lexical,omitempty"`
-	Status   string   `json:"status,omitempty"`
-	Slug     string   `json:"slug,omitempty"`
-	Tags     []string `json:"-"`
-	Featured bool     `json:"featured,omitempty"`
+	Title       string   `json:"title"`
+	HTML        string   `json:"html,omitempty"`
+	Lexical     string   `json:"lexical,omitempty"`
+	Status      string   `json:"status,omitempty"`
+	Slug        string   `json:"slug,omitempty"`
+	Tags        []string `json:"-"`
+	Featured    bool     `json:"featured,omitempty"`
+	PublishedAt string   `json:"-"` // ISO 8601 datetime
 }
 
 type createPostRequest struct {
@@ -134,6 +135,9 @@ func (c *Client) CreatePost(input CreatePostInput, useHTML bool) (*Post, error) 
 	}
 	if input.Featured {
 		post["featured"] = true
+	}
+	if input.PublishedAt != "" {
+		post["published_at"] = input.PublishedAt
 	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))
@@ -175,9 +179,10 @@ type UpdatePostInput struct {
 	Lexical   *string  `json:"-"`
 	Status    *string  `json:"-"`
 	Slug      *string  `json:"-"`
-	Tags      []string `json:"-"`
-	Featured  *bool    `json:"-"`
-	UpdatedAt string   `json:"-"` // required for conflict resolution
+	Tags        []string `json:"-"`
+	Featured    *bool    `json:"-"`
+	PublishedAt *string  `json:"-"` // ISO 8601 datetime
+	UpdatedAt   string   `json:"-"` // required for conflict resolution
 }
 
 // UpdatePost updates an existing post. Requires the current updated_at for conflict detection.
@@ -203,6 +208,9 @@ func (c *Client) UpdatePost(id string, input UpdatePostInput, useHTML bool) (*Po
 	}
 	if input.Featured != nil {
 		post["featured"] = *input.Featured
+	}
+	if input.PublishedAt != nil {
+		post["published_at"] = *input.PublishedAt
 	}
 	if len(input.Tags) > 0 {
 		tags := make([]map[string]string, len(input.Tags))
